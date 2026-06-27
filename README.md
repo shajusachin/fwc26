@@ -117,7 +117,7 @@ scripts/serve.mjs       Minimal local static server
 
 ## 📝 About
 
-A personal passion project — built and maintained by **Sachin** for the love of the
+A personal passion project — built and maintained by **Shaju** for the love of the
 game and as part of learning the art of Vibe Coding and GitHub Copilot. Contributions,
 ideas, and bug reports are welcome via Issues.
 
