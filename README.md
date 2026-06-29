@@ -125,6 +125,9 @@ ideas, and bug reports are welcome via Issues.
 endorsed by, or associated with FIFA** or any official World Cup body. All team and
 competition names belong to their respective owners.
 
-## 📄 License
+## © Copyright
 
-Released under the [MIT License](LICENSE).
+Copyright © 2026 shajusachin. **All Rights Reserved.** See [COPYRIGHT](COPYRIGHT).
+
+This repository is public for viewing only. No part may be copied, forked, or
+reused without prior written permission.
