@@ -28,6 +28,13 @@ const FORCE = process.argv.includes('--force');
 const p = (...a) => join(ROOT, ...a);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
+/* Static venue fallback: football-data.org's free tier dropped the `venue`
+   field, so the schedule renders TBD. World Cup venues are fixed by the FIFA
+   schedule, so we keep a stable id→venue map and use it whenever the API
+   omits venue. (Lives in scripts/venues.json.) */
+let VENUES = {};
+try { VENUES = JSON.parse((await readFile(p('scripts/venues.json'), 'utf8'))); } catch { VENUES = {}; }
+
 async function readJSON(file, fallback) {
   try { return JSON.parse(await readFile(p(file), 'utf8')); }
   catch { return fallback; }
@@ -86,7 +93,7 @@ async function fetchLive() {
 /* ── TRANSFORM (raw → compact) ──────────────────────────── */
 function toCompact({ matchesDoc, scorersDoc, details }) {
   const fixtures = (matchesDoc.matches || []).map(m => ({
-    id: m.id, u: m.utcDate, s: m.status, v: m.venue || 'TBD',
+    id: m.id, u: m.utcDate, s: m.status, v: m.venue || VENUES[m.id] || 'TBD',
     st: m.stage, g: m.group || null,
     h: m.homeTeam?.name ?? null, a: m.awayTeam?.name ?? null,
     hs: m.score?.fullTime?.home ?? null, as: m.score?.fullTime?.away ?? null,
