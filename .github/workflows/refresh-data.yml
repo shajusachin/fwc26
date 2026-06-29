@@ -2,7 +2,7 @@ name: Refresh World Cup data
 
 on:
   schedule:
-    - cron: '*/10 * * * *'   # every 10 minutes
+    - cron: '*/5 * * * *'   # every 5 minutes (GitHub Actions minimum)
   workflow_dispatch:          # manual "Run workflow" button
   push:
     branches: [ main ]
