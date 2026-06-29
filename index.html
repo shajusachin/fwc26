@@ -126,25 +126,26 @@
   .matches-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;}
   body.one-col .matches-grid{grid-template-columns:1fr;}
 
-  .match{display:grid;grid-template-columns:50px 20px 1fr 56px 1fr 70px;align-items:center;gap:8px;
+  .match{display:grid;grid-template-columns:50px 20px 1fr 56px 1fr;align-items:center;gap:6px 8px;
     background:var(--bg-match);border:1px solid var(--border);border-left:3px solid transparent;
-    border-radius:6px;padding:8px 11px;font-size:13.5px;transition:background .15s;}
+    border-radius:6px;padding:8px 11px;font-size:14.5px;transition:background .15s;}
   .match:hover{background:var(--bg-card);}
   .match.hl{background:var(--hl);border-left-color:var(--hl-bl);}
   .match.done{opacity:.8;}
   .m-time{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12.5px;color:var(--text);line-height:1.1;}
   .m-time .m-live{color:var(--green);font-size:10px;font-weight:800;letter-spacing:.5px;display:block;}
   .m-grp{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:12px;text-align:center;}
-  .m-home{text-align:right;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .m-away{text-align:left;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .m-home{text-align:right;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .m-away{text-align:left;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .m-home .fl{margin-right:0;margin-left:6px;}
   .m-mid{font-family:'Barlow Condensed',sans-serif;font-weight:800;text-align:center;min-width:56px;}
   .m-mid .sc{color:var(--gold);font-size:15px;letter-spacing:1px;}
   .m-mid .vs{color:var(--text-muted);font-size:12px;}
   .m-mid .ft{display:block;color:var(--text-muted);font-size:8.5px;font-weight:700;letter-spacing:.5px;}
-  .m-venue{font-family:'Barlow Condensed',sans-serif;font-size:10.5px;color:var(--text-sub);text-align:right;
-    line-height:1.25;white-space:normal;}
-  .m-venue .m-city{display:block;color:var(--text-muted);font-size:10px;}
+  .m-venue{grid-column:1/-1;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;
+    color:var(--text-sub);text-align:center;line-height:1.2;white-space:normal;letter-spacing:.3px;
+    border-top:1px solid var(--border);padding-top:5px;margin-top:2px;}
+  .m-venue .m-city{color:var(--text-muted);font-weight:500;}
   body.hide-scores .m-mid .sc,body.hide-scores .m-mid .ft{visibility:hidden;}
 
   /* Event card (hover/tap popup on completed matches) */
@@ -330,7 +331,7 @@
   @media (max-width:560px){
     body:not(.one-col) .matches-grid{grid-template-columns:1fr;}
     .match{grid-template-columns:46px 16px 1fr 52px 1fr;}
-    .m-venue{display:none;}
+    .m-venue{font-size:11px;padding-top:4px;}
     .header-right{align-items:center;width:100%;}
     .ctrl-row,.filters,.hl-rows{justify-content:center;}
     .nav-btn,.btn{min-height:40px;padding-top:9px;padding-bottom:9px;}
@@ -500,7 +501,7 @@ const HOST_EXTRA = {
 };
 const venueCity = v => HOSTS[v] ? `${HOSTS[v].city}, ${HOSTS[v].st}` : '';
 const venueFull = v => (v && HOSTS[v]) ? `${v}, ${venueCity(v)}` : (v||"TBD");
-const venueLines = v => (v && HOSTS[v]) ? `${v}<span class="m-city">${venueCity(v)}</span>` : (v||"TBD");
+const venueLines = v => (v && HOSTS[v]) ? `📍 ${v} <span class="m-city">· ${venueCity(v)}</span>` : (v||"TBD");
 function flagByIso(code,cls){ return code?`<img class="fl${cls?' '+cls:''}" loading="lazy" src="https://flagcdn.com/h20/${code}.png" alt="" onerror="this.style.visibility='hidden'">`:''; }
 
 /* ── DATA (mutable; live fetch can replace these) ──────── */
@@ -626,7 +627,7 @@ let state = {
   tz: LS('wc-tz') || 'auto',
   hour12: LS('wc-h12')!=='false',
   twoCol: LS('wc-2col')!=='false',
-  theme: LS('wc-theme') || 'dark',
+  theme: LS('wc-theme') || 'light',
   print: false,
   hideScores: LS('wc-hs')==='true',
   hideCompleted: LS('wc-hc')==='true',
