@@ -364,7 +364,7 @@
     gap:6px 10px;flex:1;min-height:0;}
   .pband-tag{position:absolute;left:6px;top:6px;font-family:'Barlow Condensed',sans-serif;font-weight:800;
     font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.72);}
-  .pchip{display:flex;flex-direction:column;align-items:center;gap:2px;width:58px;cursor:pointer;}
+  .pchip{display:flex;flex-direction:column;align-items:center;gap:2px;width:58px;}
   .pchip .num{width:30px;height:30px;border-radius:50%;background:#0A0E1A;color:#fff;border:2px solid rgba(255,255,255,.85);
     display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;
     font-family:'Barlow Condensed',sans-serif;}
@@ -498,7 +498,7 @@
 
   <div id="view-squad" style="display:none">
     <div class="section-title">Teams</div>
-    <p class="hint">Every team's official 26-player squad. Players are placed on the pitch by <strong>role</strong> — Goalkeepers, Defenders, Midfielders, Forwards. Tap any player for club, caps &amp; age. Exact positions and starting line-ups aren't published as open data, so we show honest role bands only — never a made-up formation.</p>
+    <p class="hint">Every team's official 26-player squad. Players are placed on the pitch by <strong>role</strong> — Goalkeepers, Defenders, Midfielders, Forwards. Each player's club, caps &amp; number are listed in the roster beside the pitch. Exact positions and starting line-ups aren't published as open data, so we show honest role bands only — never a made-up formation.</p>
     <div class="squad-controls">
       <label for="squad-team" style="font-family:'Barlow Condensed',sans-serif;color:var(--text-muted)">Team</label>
       <select id="squad-team"></select>
@@ -1161,8 +1161,7 @@ function initSquadPicker(){
 }
 function pchip(p){
   const cls=p.pos==='GK'?'pchip gk':'pchip';
-  const idx=SQUADS.teams[state.squadTeam].indexOf(p);
-  return `<div class="${cls}" onclick="showPlayer(${idx})" title="${p.name}">
+  return `<div class="${cls}" title="${p.name}">
     <div class="num">${p.no??''}</div><div class="pn">${surname(p.name)}</div></div>`;
 }
 function renderSquad(team){
@@ -1188,15 +1187,6 @@ function renderSquad(team){
         <span class="rclub">${p.club||''}</span></div>`).join('')}</div>`;
   const roster=['GK','DF','MF','FW'].map(group).join('');
   $('squad-layout').innerHTML=`<div class="pitch-col">${pitch}</div><div class="roster-col">${roster}</div>`;
-}
-function showPlayer(idx){
-  const sq=SQUADS.teams[state.squadTeam]; const p=sq&&sq[idx]; if(!p) return;
-  const line=[
-    p.club?`Club: ${p.club}`:null,
-    p.caps!=null?`Caps: ${p.caps}`:null,
-    p.goals!=null?`Int'l goals: ${p.goals}`:null,
-  ].filter(Boolean).join('  ·  ');
-  alert(`#${p.no??'—'}  ${p.name}\n${BAND_LABEL[p.pos]||p.pos}\n${line}`);
 }
 
 /* ── JUMP ──────────────────────────────────────────────── */
