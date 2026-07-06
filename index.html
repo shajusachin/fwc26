@@ -418,11 +418,11 @@
       </div>
       <div class="nav-row">
         <button class="nav-btn active" data-view="schedule">📅 Schedule</button>
-        <button class="nav-btn" data-view="standings">📊 Groups</button>
         <button class="nav-btn" data-view="bracket">🏆 Knockout</button>
-        <button class="nav-btn" data-view="scorers">⚽ Top Scorers</button>
-        <button class="nav-btn" data-view="squad">👥 Squads</button>
         <button class="nav-btn" data-view="cities">🏟 Host Cities</button>
+        <button class="nav-btn" data-view="standings">📊 Groups</button>
+        <button class="nav-btn" data-view="squad">👥 Teams</button>
+        <button class="nav-btn" data-view="scorers">⚽ Top Scorers</button>
       </div>
     </div>
     <div class="header-right">
@@ -455,9 +455,9 @@
           <div class="hl-rows" id="hl-rows"></div>
         </div>
         <div class="filters">
-          <select id="city-filter"><option value="all">All cities</option></select>
-          <select id="group-filter"><option value="all">All groups</option></select>
-          <select id="team-filter"><option value="all">All teams</option></select>
+          <select id="city-filter"><option value="all">All Host Cities</option></select>
+          <select id="group-filter"><option value="all">All Groups</option></select>
+          <select id="team-filter"><option value="all">All Teams</option></select>
         </div>
       </div>
     </div>
@@ -488,7 +488,7 @@
   </div>
 
   <div id="view-squad" style="display:none">
-    <div class="section-title">Squads</div>
+    <div class="section-title">Teams</div>
     <p class="hint">Every team's official 26-player squad. Players are placed on the pitch by <strong>role</strong> — Goalkeepers, Defenders, Midfielders, Forwards. Tap any player for club, caps &amp; age. Exact positions and starting line-ups aren't published as open data, so we show honest role bands only — never a made-up formation.</p>
     <div class="squad-controls">
       <label for="squad-team" style="font-family:'Barlow Condensed',sans-serif;color:var(--text-muted)">Team</label>
@@ -728,14 +728,14 @@ function initControls(){
   setSwitch('cs-track', state.twoCol, 'cs-1','cs-2');
 
   const cities = [...new Set(ALL.map(m=>m.venue))].filter(Boolean).sort();
-  $('city-filter').innerHTML = `<option value="all">All cities</option>`+cities.map(c=>`<option value="${c}">${venueFull(c)}</option>`).join('');
-  $('group-filter').innerHTML = `<option value="all">All groups</option>`+
+  $('city-filter').innerHTML = `<option value="all">All Host Cities</option>`+cities.map(c=>`<option value="${c}">${venueFull(c)}</option>`).join('');
+  $('group-filter').innerHTML = `<option value="all">All Groups</option>`+
     GROUP_LETTERS.map(g=>`<option value="${g}">Group ${g}</option>`).join('')+
     `<option value="LAST_32">Round of 32</option><option value="LAST_16">Round of 16</option>`+
     `<option value="QUARTER_FINALS">Quarter-finals</option><option value="SEMI_FINALS">Semi-finals</option>`+
     `<option value="THIRD_PLACE">Third place</option><option value="FINAL">Final</option>`;
   const teams=[...new Set(ALL.flatMap(m=>[m.home,m.away]))].filter(Boolean).sort();
-  $('team-filter').innerHTML = `<option value="all">All teams</option>`+teams.map(t=>`<option value="${t}">${short(t)}</option>`).join('');
+  $('team-filter').innerHTML = `<option value="all">All Teams</option>`+teams.map(t=>`<option value="${t}">${short(t)}</option>`).join('');
   $('tz-select').value=state.tz; $('city-filter').value=state.city; $('group-filter').value=state.group; $('team-filter').value=state.team;
 
   renderHL();
