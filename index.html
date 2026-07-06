@@ -360,7 +360,6 @@
       </div>
       <div class="nav-row">
         <button class="nav-btn active" data-view="schedule">📅 Schedule</button>
-        <button class="nav-btn" data-view="live">🔴 Live</button>
         <button class="nav-btn" data-view="standings">📊 Groups</button>
         <button class="nav-btn" data-view="bracket">🏆 Knockout</button>
         <button class="nav-btn" data-view="scorers">⚽ Top Scorers</button>
@@ -408,12 +407,6 @@
   <div id="view-schedule">
     <div class="legend" id="legend"></div>
     <div id="schedule"></div>
-  </div>
-
-  <div id="view-live" style="display:none">
-    <div class="section-title">Live &amp; Today</div>
-    <p class="hint" id="live-note">Live scores update every ~5 min from the official feed. The free data tier provides scores &amp; half-time only — no minute-by-minute clock or live goal feed, so none is shown.</p>
-    <div id="live-board"></div>
   </div>
 
   <div id="view-standings" style="display:none">
@@ -697,7 +690,7 @@ function initControls(){
 function setView(v){
   state.view=v;
   document.querySelectorAll('.nav-btn').forEach(x=>x.classList.toggle('active',x.dataset.view===v));
-  ['schedule','live','standings','bracket','scorers','cities'].forEach(name=>{
+  ['schedule','standings','bracket','scorers','cities'].forEach(name=>{
     const el=$('view-'+name); if(el) el.style.display = v===name?'':'none';
   });
   $('jump-btn').style.display = v==='schedule'?'':'none';
@@ -788,42 +781,6 @@ function renderSchedule(){
     html += `</div></div>`;
   }
   $('schedule').innerHTML = html || `<p class="hint">No matches match the current filters.</p>`;
-}
-
-function liveCard(m){
-  const live=(m.status==='IN_PLAY'||m.status==='PAUSED');
-  const hasDetail = m.id && DT[m.id] && DT[m.id].g && DT[m.id].g.length;
-  const grpBadge = m.group ? `<span class="m-grp gc-${m.group}">${m.group}</span>`
-    : `<span class="m-grp" style="color:var(--text-muted);font-size:9px">${(STAGE_LABEL[m.stage]||'').replace(/[a-z- ]/g,'').slice(0,3)||'KO'}</span>`;
-  return `<div class="match ${isHL(m)?'hl':''} ${m.status==='FINISHED'?'done':''} ${hasDetail?'has-detail':''}" ${hasDetail?`data-mid="${m.id}"`:''}>
-    <span class="m-time">${fmtTime(m.date)}${live?'<span class="m-live">● LIVE</span>':''}</span>
-    ${grpBadge}
-    <span class="m-home">${teamHTML(m.home,'home')}</span>
-    <span class="m-mid">${scoreCell(m)}</span>
-    <span class="m-away">${teamHTML(m.away,'away')}</span>
-    <span class="m-venue">${venueLines(m.venue)}</span>
-  </div>`;
-}
-function renderLive(){
-  const tk=todayKey();
-  const liveM=ALL.filter(m=>m.status==='IN_PLAY'||m.status==='PAUSED').sort((a,b)=>a.date-b.date);
-  const today=ALL.filter(m=>dayKey(m.date)===tk && m.status!=='IN_PLAY' && m.status!=='PAUSED').sort((a,b)=>a.date-b.date);
-  let html='';
-  if(liveM.length){
-    html+=`<div class="day-head is-today">● Live now <span class="dh-count">${liveM.length} in progress</span></div>
-      <div class="matches-grid">${liveM.map(liveCard).join('')}</div>`;
-  }
-  if(today.length){
-    const fin=today.filter(m=>m.status==='FINISHED'), up=today.filter(m=>m.status!=='FINISHED');
-    if(up.length) html+=`<div class="day-head">Upcoming today <span class="dh-count">${up.length} match${up.length>1?'es':''}</span></div><div class="matches-grid">${up.map(liveCard).join('')}</div>`;
-    if(fin.length) html+=`<div class="day-head">Final today <span class="dh-count">${fin.length} match${fin.length>1?'es':''}</span></div><div class="matches-grid">${fin.map(liveCard).join('')}</div>`;
-  }
-  if(!html){
-    const next=ALL.filter(m=>m.status!=='FINISHED' && m.date>=new Date()).sort((a,b)=>a.date-b.date)[0];
-    html = next ? `<p class="hint">No live or scheduled matches today. Next up: <strong>${short(next.home)} v ${short(next.away)}</strong> · ${dayLabel(next.date)} · ${fmtTime(next.date)}.</p>`
-                : `<p class="hint">No upcoming matches — tournament complete.</p>`;
-  }
-  $('live-board').innerHTML = html;
 }
 
 /* ── STANDINGS ─────────────────────────────────────────── */
@@ -1182,7 +1139,7 @@ function applyDeepLink(){
 }
 
 /* ── RENDER ────────────────────────────────────────────── */
-function render(){ renderLegend(); renderNext(); renderSchedule(); renderLive(); renderStandings(); renderThirdPlace(); renderScorers(); renderCities(); renderBracket(); }
+function render(){ renderLegend(); renderNext(); renderSchedule(); renderStandings(); renderThirdPlace(); renderScorers(); renderCities(); renderBracket(); }
 
 /* ── LIVE DATA LOADER ──────────────────────────────────── */
 const FEED='data-compact.json';
