@@ -232,6 +232,23 @@
   .city-link:hover{text-decoration:underline;}
   .city-card[data-venue]{cursor:pointer;}
 
+  /* North America host-cities map */
+  .na-map{width:100%;max-width:960px;margin:0 auto;}
+  .na-map svg{width:100%;height:auto;display:block;overflow:hidden;}
+  .map-land{fill:var(--bg-match);stroke:var(--border);stroke-width:1;stroke-linejoin:round;}
+  .map-dot{cursor:pointer;}
+  .map-dot .dot-hit{fill:transparent;stroke:none;}
+  .map-dot .dot{fill:var(--gold);stroke:#12213f;stroke-width:2;transition:fill .12s,stroke-width .12s;}
+  .map-dot .ring{fill:none;stroke:var(--gold);stroke-width:2;opacity:0;transition:opacity .12s;}
+  .map-dot:hover .dot,.map-dot.active .dot{fill:#ffd76a;stroke-width:3;}
+  .map-dot.active .ring{opacity:1;}
+  .map-label{fill:var(--text);font-family:'Barlow Condensed',sans-serif;font-weight:700;
+    font-size:15px;letter-spacing:.3px;paint-order:stroke;stroke:var(--bg-card);stroke-width:3.5px;
+    stroke-linejoin:round;pointer-events:none;dominant-baseline:middle;}
+  .map-legend{text-align:center;color:var(--text-muted);font-size:12.5px;margin-top:8px;
+    font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px;}
+  @media (max-width:560px){ .map-label{font-size:19px;stroke-width:4px;} }
+
   /* City hover/tap fact card */
   .city-pop{position:fixed;z-index:200;width:min(330px,92vw);background:var(--bg-card);
     border:1px solid var(--gold);border-radius:10px;box-shadow:0 12px 40px rgba(0,0,0,.6);
@@ -256,6 +273,12 @@
   .cp-weather{padding:9px 13px;border-top:1px solid var(--border);background:rgba(201,168,76,.05);
     font-size:13px;color:var(--text);}
   .cp-wx{display:flex;align-items:center;gap:6px;}
+  .city-pop.pinned{pointer-events:auto;}
+  .cp-close{position:absolute;top:5px;right:7px;cursor:pointer;color:var(--text-muted);
+    background:none;border:none;font-size:15px;line-height:1;padding:2px 4px;z-index:2;}
+  .cp-close:hover{color:var(--text);}
+  .cp-cta{padding:10px 13px;border-top:1px solid var(--border);}
+  .cp-cta .city-link{font-size:13px;}
 
   /* Match drawer (mobile-first bottom sheet) */
   .drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;opacity:0;
@@ -501,12 +524,12 @@
 
   <div id="view-cities" style="display:none">
     <div class="section-title">Host Cities &amp; Stadiums</div>
-    <p class="hint">16 stadiums across 3 nations. Tap <em>View matches</em> on any venue to jump to its fixtures.</p>
-    <div class="cities-grid" id="cities"></div>
+    <p class="hint">All 16 host stadiums across the USA, Canada &amp; Mexico. Hover a city for capacity, matches &amp; today's weather — click a dot to pin it and open <em>View matches</em>.</p>
+    <div id="cities"></div>
   </div>
 
   <div class="footer">
-    Original fan-made build · Live match &amp; scorer data from <a href="https://www.football-data.org/" target="_blank" rel="noopener">football-data.org</a> · Squad data from <a href="https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_squads" target="_blank" rel="noopener">Wikipedia</a> · Flags via <a href="https://flagcdn.com/" target="_blank" rel="noopener">flagcdn.com</a> · Live weather via <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a><br>
+    Original fan-made build · Live match &amp; scorer data from <a href="https://www.football-data.org/" target="_blank" rel="noopener">football-data.org</a> · Squad data from <a href="https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_squads" target="_blank" rel="noopener">Wikipedia</a> · Flags via <a href="https://flagcdn.com/" target="_blank" rel="noopener">flagcdn.com</a> · Live weather via <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> · Map outline from <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a><br>
     Inspired by the original <a href="https://github.com/Kingdoggydog/worldcup2026" target="_blank" rel="noopener">kingdoggydog/worldcup2026</a> project · All kickoff times shown in your selected timezone<br>
     <span style="opacity:.85">A personal passion project — built and maintained by <strong>Shaju</strong>. Not affiliated with or endorsed by FIFA.</span>
   </div>
@@ -912,27 +935,42 @@ function renderScorers(){
 function stageShort(m){ return m.group?`Group ${m.group}`:(STAGE_LABEL[m.stage]||''); }
 
 /* ── HOST CITIES ───────────────────────────────────────── */
-function renderCities(){
-  const counts={};
-  ALL.forEach(m=>{ if(m.venue) counts[m.venue]=(counts[m.venue]||0)+1; });
-  const order=Object.keys(HOSTS).sort((a,b)=> (counts[b]||0)-(counts[a]||0) || HOSTS[b].cap-HOSTS[a].cap);
-  $('cities').innerHTML = order.map(v=>{
-    const h=HOSTS[v]; const n=counts[v]||0;
-    return `<div class="city-card" data-venue="${v.replace(/"/g,'&quot;')}">
-      <div class="city-head">
-        <div class="city-name">${v}</div>
-        <div class="city-loc">${flagByIso(h.iso,'sm')}${h.city}, ${h.st} · ${h.country}</div>
-      </div>
-      <div class="city-meta">
-        <div class="cm"><div class="cm-v">${(h.cap/1000).toFixed(0)}K</div><div class="cm-l">Capacity</div></div>
-        <div class="cm"><div class="cm-v">${n}</div><div class="cm-l">Match${n===1?'':'es'}</div></div>
-      </div>
-      <div class="city-foot"><button class="city-link" data-city="${v.replace(/"/g,'&quot;')}">View matches →</button></div>
-    </div>`;
+let MAPDATA=null;
+/* City-name label offsets (viewBox units), hand-tuned so the NE cluster reads. */
+const LABELOFF = {
+  "Gillette Stadium":       {dx:10, dy:-1, a:'start'},  // Boston
+  "MetLife Stadium":        {dx:10, dy:5,  a:'start'},  // New York / NJ
+  "Lincoln Financial Field":{dx:-10,dy:11, a:'end'},    // Philadelphia
+  "BMO Field":              {dx:10, dy:-2, a:'start'},  // Toronto
+  "Mercedes-Benz Stadium":  {dx:10, dy:3,  a:'start'},  // Atlanta
+  "Hard Rock Stadium":      {dx:10, dy:3,  a:'start'},  // Miami
+  "BC Place":               {dx:-10,dy:-2, a:'end'},    // Vancouver
+  "Lumen Field":            {dx:-10,dy:10, a:'end'},    // Seattle
+  "Levi's Stadium":         {dx:-10,dy:-2, a:'end'},    // San Francisco
+  "SoFi Stadium":           {dx:-10,dy:5,  a:'end'},    // Los Angeles
+  "AKRON":                  {dx:-10,dy:4,  a:'end'},    // Guadalajara
+  "Azteca":                 {dx:10, dy:6,  a:'start'},  // Mexico City
+  "Estadio BBVA":           {dx:10, dy:0,  a:'start'},  // Monterrey
+  "Arrowhead Stadium":      {dx:0,  dy:-11,a:'middle'}, // Kansas City
+  "AT&T Stadium":           {dx:-10,dy:3,  a:'end'},    // Dallas
+  "NRG Stadium":            {dx:0,  dy:16, a:'middle'}  // Houston
+};
+async function renderCities(){
+  const host=$('cities'); if(!host) return;
+  if(!MAPDATA){
+    try{ const r=await fetch('map.json?t='+Date.now()); if(!r.ok) throw 0; MAPDATA=await r.json(); }
+    catch(_){ host.innerHTML='<p class="hint">Map could not be loaded.</p>'; return; }
+  }
+  const md=MAPDATA;
+  const land=md.land.map(d=>`<path class="map-land" d="${d}"/>`).join('');
+  const dots=Object.entries(md.dots).map(([v,d])=>{
+    const o=LABELOFF[v]||{dx:10,dy:4,a:'start'};
+    return `<g class="map-dot" data-venue="${v.replace(/"/g,'&quot;')}" transform="translate(${d.x},${d.y})">
+      <circle class="ring" r="11"></circle><circle class="dot-hit" r="16"></circle><circle class="dot" r="6"></circle>
+      <text class="map-label" x="${o.dx}" y="${o.dy}" text-anchor="${o.a}">${d.city}</text></g>`;
   }).join('');
-  $('cities').querySelectorAll('.city-link').forEach(b=>{
-    b.onclick=()=>{ state.city=b.dataset.city; $('city-filter').value=state.city; renderSchedule(); setView('schedule'); $('jump-btn').style.display='none'; window.scrollTo({top:0,behavior:'smooth'}); };
-  });
+  host.innerHTML=`<div class="na-map"><svg viewBox="0 0 ${md.w} ${md.h}" role="img" aria-label="Map of 2026 FIFA World Cup host cities across North America"><g>${land}</g><g>${dots}</g></svg></div>
+    <div class="map-legend">Hover a city for details · click a dot to pin it &amp; open “View matches”. 16 stadiums · 🇺🇸 USA · 🇨🇦 Canada · 🇲🇽 Mexico</div>`;
 }
 
 /* ── CITY FACT CARD (hover desktop / tap mobile) + live weather ── */
@@ -957,36 +995,28 @@ async function fetchWeather(v){
 }
 const STAGE_ORDER=['GROUP_STAGE','LAST_32','LAST_16','QUARTER_FINALS','SEMI_FINALS','THIRD_PLACE','FINAL'];
 function buildCityCard(v){
-  const h=HOSTS[v], e=HOST_EXTRA[v]||{};
+  const h=HOSTS[v];
   const ms=ALL.filter(m=>m.venue===v).sort((a,b)=>a.date-b.date);
-  const stages=[...new Set(ms.map(m=>m.stage))].sort((a,b)=>STAGE_ORDER.indexOf(a)-STAGE_ORDER.indexOf(b));
-  let roleStr='—';
-  if(stages.length===1) roleStr=STAGE_LABEL[stages[0]]||'—';
-  else if(stages.length>1) roleStr=`${STAGE_LABEL[stages[0]]} → ${STAGE_LABEL[stages[stages.length-1]]}`;
   const now=new Date();
   const next=ms.find(m=>m.status!=='FINISHED' && m.date>=now) || ms.find(m=>m.status!=='FINISHED');
   const nm = n => n?short(n):'TBD';
   const nextStr = next ? `${dShort(next.date)} · ${nm(next.home)} v ${nm(next.away)}` : 'None';
-  return `<div class="cp-head">${flagByIso(h.iso)}<div><div class="cp-name">${v}</div>
+  return `<button class="cp-close" data-cpclose title="Close">✕</button>
+    <div class="cp-head">${flagByIso(h.iso)}<div><div class="cp-name">${v}</div>
       <div class="cp-sub">${h.city}, ${h.st} · ${h.country}</div></div></div>
-    ${e.note?`<div class="cp-note">${e.note}</div>`:''}
     <div class="cp-facts">
-      <div class="cpf"><span class="cpf-l">Opened</span><span class="cpf-v">${e.opened||'—'}</span></div>
-      <div class="cpf"><span class="cpf-l">Roof</span><span class="cpf-v">${e.roof||'—'}</span></div>
-      <div class="cpf"><span class="cpf-l">Surface</span><span class="cpf-v">${e.surface||'—'}</span></div>
-      <div class="cpf"><span class="cpf-l">Elevation</span><span class="cpf-v">${e.elev!=null?e.elev.toLocaleString()+' ft':'—'}</span></div>
-      <div class="cpf wide"><span class="cpf-l">Home tenant</span><span class="cpf-v">${e.tenant||'—'}</span></div>
+      <div class="cpf"><span class="cpf-l">Capacity</span><span class="cpf-v">${h.cap?h.cap.toLocaleString():'—'}</span></div>
+      <div class="cpf"><span class="cpf-l">Total matches</span><span class="cpf-v">${ms.length}</span></div>
     </div>
     <div class="cp-sec">
-      <div class="cp-sec-t">Tournament Role</div>
-      <div class="cp-line"><span class="cp-k">Hosts</span>${roleStr} <span class="cp-muted">· ${ms.length} match${ms.length===1?'':'es'}</span></div>
       <div class="cp-line"><span class="cp-k">Next here</span>${nextStr}</div>
     </div>
-    <div class="cp-weather"><span class="cp-wx">🌡 <strong>Today's Weather:</strong> loading…</span></div>`;
+    <div class="cp-weather"><span class="cp-wx">🌡 <strong>Today's Weather:</strong> loading…</span></div>
+    <div class="cp-cta"><button class="city-link" data-venue="${v.replace(/"/g,'&quot;')}">View matches →</button></div>`;
 }
 const cityPop=document.createElement('div'); cityPop.className='city-pop'; cityPop.style.display='none';
 document.body.appendChild(cityPop);
-let cityPopVenue=null;
+let cityPopVenue=null, cityPopPinned=false, popHideTimer=null;
 function placeCityPop(target){
   const r=target.getBoundingClientRect();
   cityPop.style.display='block';
@@ -1004,30 +1034,52 @@ async function loadCityWeather(v){
   el.innerHTML = wx ? `${wx.ic} <strong>Today's Weather:</strong> ${wx.t}°F · ${wx.desc}`
                     : `🌡 <strong>Today's Weather:</strong> unavailable`;
 }
-function showCityPop(target){
+function showCityPop(target, pin){
   const v=target.getAttribute('data-venue'); if(!v||!HOSTS[v]) return;
-  cityPopVenue=v;
+  cityPopVenue=v; cityPopPinned=!!pin;
   cityPop.innerHTML=buildCityCard(v);
-  placeCityPop(target);
+  cityPop.classList.toggle('pinned', !!pin);
+  const anchor=target.querySelector('.dot')||target;
+  placeCityPop(anchor);
+  markActiveDot(v);
   loadCityWeather(v);
 }
-function hideCityPop(){ cityPop.style.display='none'; cityPopVenue=null; }
-const CITY_TOUCH = window.matchMedia('(hover: none)').matches;
-if(CITY_TOUCH){
-  document.addEventListener('click',e=>{
-    if(e.target.closest('.city-link')) return;
-    const t=e.target.closest('.city-card');
-    if(t){ if(cityPopVenue===t.getAttribute('data-venue')) hideCityPop(); else showCityPop(t); }
-    else hideCityPop();
-  });
-} else {
+function hideCityPop(){ cityPop.style.display='none'; cityPopVenue=null; cityPopPinned=false; cityPop.classList.remove('pinned'); markActiveDot(null); }
+function markActiveDot(v){ document.querySelectorAll('.map-dot').forEach(d=>d.classList.toggle('active', d.getAttribute('data-venue')===v)); }
+function goVenueMatches(v){
+  state.city=v; state.group='all'; state.team='all';
+  const cf=$('city-filter'), gf=$('group-filter'), tf=$('team-filter');
+  if(cf) cf.value=v; if(gf) gf.value='all'; if(tf) tf.value='all';
+  hideCityPop(); renderSchedule(); setView('schedule'); $('jump-btn').style.display='none'; window.scrollTo({top:0,behavior:'smooth'});
+}
+cityPop.addEventListener('mouseenter',()=>clearTimeout(popHideTimer));
+cityPop.addEventListener('mouseleave',()=>{ if(!cityPopPinned) hideCityPop(); });
+cityPop.addEventListener('click',e=>{
+  if(e.target.closest('[data-cpclose]')){ hideCityPop(); return; }
+  const vm=e.target.closest('.city-link[data-venue]');
+  if(vm){ goVenueMatches(vm.getAttribute('data-venue')); }
+});
+const MAP_TOUCH = window.matchMedia('(hover: none)').matches;
+if(!MAP_TOUCH){
   document.addEventListener('mouseover',e=>{
-    const t=e.target.closest('.city-card'); if(t && !e.target.closest('.city-link')) showCityPop(t);
+    if(cityPopPinned) return;
+    const d=e.target.closest('.map-dot'); if(d){ clearTimeout(popHideTimer); showCityPop(d,false); }
   });
   document.addEventListener('mouseout',e=>{
-    const t=e.target.closest('.city-card'); if(t && !t.contains(e.relatedTarget)) hideCityPop();
+    if(cityPopPinned) return;
+    const d=e.target.closest('.map-dot'); if(!d) return;
+    const to=e.relatedTarget;
+    if(d.contains(to) || to===cityPop || (cityPop.contains&&cityPop.contains(to))) return;
+    clearTimeout(popHideTimer); popHideTimer=setTimeout(()=>{ if(!cityPopPinned) hideCityPop(); },180);
   });
 }
+document.addEventListener('click',e=>{
+  const d=e.target.closest('.map-dot');
+  if(d){ const v=d.getAttribute('data-venue');
+    if(cityPopPinned && cityPopVenue===v) hideCityPop(); else showCityPop(d,true);
+    return; }
+  if(cityPopPinned && !cityPop.contains(e.target)) hideCityPop();
+});
 window.addEventListener('scroll',()=>hideCityPop(), true);
 
 /* ── BRACKET ───────────────────────────────────────────── */
