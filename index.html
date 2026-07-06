@@ -754,7 +754,7 @@ function renderLegend(){
 /* ── SCHEDULE ──────────────────────────────────────────── */
 function scoreCell(m){
   if(m.status==='FINISHED' && m.hs!=null){
-    const pen = m.pen ? `<span class="ft">pens ${m.pen.h}–${m.pen.a}</span>` : '';
+    const pen = m.pen ? `<span class="ft">Penalties ${m.pen.h}–${m.pen.a}</span>` : '';
     return `<span class="sc">${m.hs}–${m.as}</span>${pen?pen:`<span class="ft">FT</span>`}`;
   }
   if(m.status==='IN_PLAY'||m.status==='PAUSED') return `<span class="sc">${m.hs??0}–${m.as??0}</span>`;
@@ -1052,7 +1052,7 @@ function buildEventCard(m){
   const d=DT[m.id]; if(!d) return '';
   const ht = d.ht && d.ht.home!=null ? `Half-time: ${d.ht.home}–${d.ht.away}` : '';
   const goalRow = g=>{
-    const og = g.ty==='OWN' ? ' <span style="color:var(--text-muted)">(OG)</span>' : (g.ty==='PENALTY'?' <span style="color:var(--text-muted)">(P)</span>':'');
+    const og = g.ty==='OWN' ? ' <span style="color:var(--text-muted)">(Own Goal)</span>' : (g.ty==='PENALTY'?' <span style="color:var(--text-muted)">(Penalty)</span>':'');
     return `<div class="ev-row"><span class="ev-min">${g.m}'</span><span><span class="ev-pl">⚽ ${g.s}</span>${og}${g.a?`<br><span class="ev-as">↳ ${g.a}</span>`:''}</span></div>`;
   };
   const sideHTML = (team,side)=>{
@@ -1110,7 +1110,7 @@ function buildTimeline(m){
   const ev=[];
   (d.g||[]).forEach(g=>{
     const own=g.ty==='OWN'; const forTeam = own ? (g.t===m.home?m.away:m.home) : g.t;
-    const tag = g.ty==='OWN'?' (OG)':(g.ty==='PENALTY'?' (pen)':'');
+    const tag = g.ty==='OWN'?' (Own Goal)':(g.ty==='PENALTY'?' (Penalty)':'');
     ev.push({m:g.m??0, side:forTeam===m.home?'home':'away', ic:'⚽',
       main:`${g.s||''}${tag}`, sub:g.a?`assist: ${g.a}`:''});
   });
