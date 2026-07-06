@@ -104,7 +104,7 @@ scripts/refresh.mjs     Builds the feed (live from the API, or offline from raw 
 scripts/build-squads.mjs  One-off builder for squads.json (parses Wikipedia squads)
 scripts/build-map.mjs   One-off builder for map.json (projects Natural Earth outline + stadium coords)
 scripts/serve.mjs       Minimal local static server
-.github/workflows/      Scheduled data-refresh Action
+.github/workflows/      Scheduled data-refresh + GitHub Pages deploy Actions
 ```
 
 ---
