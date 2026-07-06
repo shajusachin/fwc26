@@ -214,23 +214,9 @@
   .scorers-wrap tbody tr:nth-child(-n+3) td.gls{color:var(--green);}
 
   /* Host Cities */
-  .cities-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px;}
-  .city-card{background:var(--bg-card);border:1px solid var(--border);border-radius:9px;overflow:hidden;
-    display:flex;flex-direction:column;transition:border-color .2s,transform .2s;}
-  .city-card:hover{border-color:var(--gold);transform:translateY(-2px);}
-  .city-head{padding:12px 14px;border-bottom:1px solid var(--border);}
-  .city-name{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:17px;letter-spacing:.5px;color:var(--text);}
-  .city-loc{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.5px;color:var(--text-sub);
-    margin-top:3px;display:flex;align-items:center;gap:6px;text-transform:uppercase;}
-  .city-meta{display:flex;gap:16px;padding:11px 14px;}
-  .city-meta .cm{flex:1;}
-  .city-meta .cm-v{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:19px;color:var(--gold);line-height:1;}
-  .city-meta .cm-l{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-muted);margin-top:3px;}
-  .city-foot{margin-top:auto;padding:10px 14px;border-top:1px solid var(--border);}
   .city-link{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.5px;
     text-transform:uppercase;color:var(--gold);background:none;border:none;cursor:pointer;padding:0;}
   .city-link:hover{text-decoration:underline;}
-  .city-card[data-venue]{cursor:pointer;}
 
   /* North America host-cities map */
   .na-map{width:100%;max-width:960px;margin:0 auto;}
@@ -993,7 +979,7 @@ async function fetchWeather(v){
     WEATHER_CACHE[v]=out; return out;
   }catch(_){ return null; }
 }
-const STAGE_ORDER=['GROUP_STAGE','LAST_32','LAST_16','QUARTER_FINALS','SEMI_FINALS','THIRD_PLACE','FINAL'];
+
 function buildCityCard(v){
   const h=HOSTS[v];
   const ms=ALL.filter(m=>m.venue===v).sort((a,b)=>a.date-b.date);
