@@ -64,6 +64,7 @@
   .data-status.error .ds-dot{background:#e5534b;}
   @keyframes dspulse{0%{box-shadow:0 0 0 0 rgba(52,208,88,.6)}70%{box-shadow:0 0 0 7px rgba(52,208,88,0)}100%{box-shadow:0 0 0 0 rgba(52,208,88,0)}}
   .header-right{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%;}
+  #schedule-controls{display:flex;flex-direction:column;gap:10px;align-items:center;width:100%;}
   .ctrl-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;}
   .ctrl-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;
     letter-spacing:1px;text-transform:uppercase;color:var(--text-sub);white-space:nowrap;}
@@ -430,30 +431,32 @@
         <button class="btn" id="theme">☀ Light</button>
         <button class="btn" id="reset-btn" title="Clear saved settings (theme, timezone, highlights)">↺ Reset</button>
       </div>
-      <div class="ctrl-row">
-        <div class="time-switch" id="time-switch" title="Toggle 12/24 hour time">
-          <span class="ts-label active" id="ts-12">12h</span>
-          <div class="ts-track" id="ts-track"><div class="ts-thumb"></div></div>
-          <span class="ts-label" id="ts-24">24h</span>
+      <div id="schedule-controls">
+        <div class="ctrl-row">
+          <div class="time-switch" id="time-switch" title="Toggle 12/24 hour time">
+            <span class="ts-label active" id="ts-12">12h</span>
+            <div class="ts-track" id="ts-track"><div class="ts-thumb"></div></div>
+            <span class="ts-label" id="ts-24">24h</span>
+          </div>
+          <div class="time-switch" id="col-switch" title="Toggle 1/2 columns">
+            <span class="ts-label" id="cs-1">1 col</span>
+            <div class="ts-track on" id="cs-track"><div class="ts-thumb"></div></div>
+            <span class="ts-label active" id="cs-2">2 col</span>
+          </div>
         </div>
-        <div class="time-switch" id="col-switch" title="Toggle 1/2 columns">
-          <span class="ts-label" id="cs-1">1 col</span>
-          <div class="ts-track on" id="cs-track"><div class="ts-thumb"></div></div>
-          <span class="ts-label active" id="cs-2">2 col</span>
+        <div class="ctrl-row">
+          <span class="ctrl-label">Timezone</span>
+          <select id="tz-select"></select>
         </div>
-      </div>
-      <div class="ctrl-row">
-        <span class="ctrl-label">Timezone</span>
-        <select id="tz-select"></select>
-      </div>
-      <div class="ctrl-row" style="align-items:flex-start">
-        <span class="ctrl-label" style="margin-top:7px">Highlight</span>
-        <div class="hl-rows" id="hl-rows"></div>
-      </div>
-      <div class="filters">
-        <select id="city-filter"><option value="all">All cities</option></select>
-        <select id="group-filter"><option value="all">All groups</option></select>
-        <select id="team-filter"><option value="all">All teams</option></select>
+        <div class="ctrl-row" style="align-items:flex-start">
+          <span class="ctrl-label" style="margin-top:7px">Highlight</span>
+          <div class="hl-rows" id="hl-rows"></div>
+        </div>
+        <div class="filters">
+          <select id="city-filter"><option value="all">All cities</option></select>
+          <select id="group-filter"><option value="all">All groups</option></select>
+          <select id="team-filter"><option value="all">All teams</option></select>
+        </div>
       </div>
     </div>
   </div>
@@ -758,6 +761,7 @@ function setView(v){
     const el=$('view-'+name); if(el) el.style.display = v===name?'':'none';
   });
   if(v==='squad') loadSquads();
+  const sc=$('schedule-controls'); if(sc) sc.style.display = v==='schedule'?'':'none';
   $('jump-btn').style.display = v==='schedule'?'':'none';
 }
 function setSwitch(track,on,leftId,rightId){
