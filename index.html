@@ -186,7 +186,9 @@
   .groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;}
   .grp-card{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
   .grp-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:15px;letter-spacing:1px;
-    text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border);}
+    text-transform:uppercase;padding:8px 12px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .grp-title .city-link{flex:none;}
   table{width:100%;border-collapse:collapse;font-size:13px;}
   th,td{padding:6px 7px;text-align:center;}
   th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:.5px;
@@ -876,10 +878,9 @@ function renderStandings(){
         <td>${(r.GF-r.GA>0?'+':'')+(r.GF-r.GA)}</td><td class="pts">${r.Pts}</td>
       </tr>`).join('');
     return `<div class="grp-card">
-      <div class="grp-title gc-${L}">Group ${L}</div>
+      <div class="grp-title gc-${L}"><span>Group ${L}</span><button class="city-link" data-group="${L}">View matches →</button></div>
       <table><thead><tr><th>#</th><th style="text-align:left">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead>
-      <tbody>${rows}</tbody></table>
-      <div class="city-foot"><button class="city-link" data-group="${L}">View matches →</button></div></div>`;
+      <tbody>${rows}</tbody></table></div>`;
   }).join('');
   $('groups').querySelectorAll('.city-link[data-group]').forEach(b=>{
     b.onclick=()=>{ state.group=b.dataset.group; state.city='all'; state.team='all';
