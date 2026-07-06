@@ -494,6 +494,7 @@
       <label for="squad-team" style="font-family:'Barlow Condensed',sans-serif;color:var(--text-muted)">Team</label>
       <select id="squad-team"></select>
       <span class="squad-meta" id="squad-meta"></span>
+      <button class="city-link" id="squad-view-matches" style="margin-left:auto">View matches →</button>
     </div>
     <div class="squad-layout" id="squad-layout"></div>
   </div>
@@ -1113,6 +1114,11 @@ function initSquadPicker(){
   const preferred=names.includes('Argentina')?'Argentina':names[0];
   sel.value=preferred;
   sel.onchange=()=>renderSquad(sel.value);
+  const vm=$('squad-view-matches');
+  if(vm) vm.onclick=()=>{ if(!state.squadTeam) return;
+    state.team=state.squadTeam; state.group='all'; state.city='all';
+    $('team-filter').value=state.team; $('group-filter').value='all'; $('city-filter').value='all';
+    renderSchedule(); setView('schedule'); $('jump-btn').style.display='none'; window.scrollTo({top:0,behavior:'smooth'}); };
   renderSquad(preferred);
 }
 function pchip(p){
