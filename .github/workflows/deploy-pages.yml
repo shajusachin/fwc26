@@ -1,17 +1,16 @@
 name: Deploy to GitHub Pages
 
 # Publishes the site via the modern GitHub Actions Pages pipeline.
-# Replaces the legacy branch build, whose queue-less publisher kept jamming
-# ("building… 0s") when the every-5-min data-refresh commits collided with it.
+#
+# Deploys only on real code/content pushes to main (plus manual dispatch).
+# Live match data is NOT deployed here: the page fetches data-compact.json
+# straight from raw.githubusercontent.com, so the hourly data-refresh updates
+# scores WITHOUT any redeploy. That removes the old workflow_run trigger that
+# turned every data refresh into a Pages redeploy — the source of the recurring
+# transient "Deployment failed, try again later" failure emails.
 on:
   push:
     branches: [ main ]
-  # The data-refresh workflow pushes commits with the built-in GITHUB_TOKEN,
-  # and token pushes do NOT trigger `push` workflows (anti-recursion rule).
-  # So we also deploy whenever that workflow finishes, to keep live scores fresh.
-  workflow_run:
-    workflows: [ "Refresh World Cup data" ]
-    types: [ completed ]
   workflow_dispatch:
 
 permissions:
@@ -19,20 +18,16 @@ permissions:
   pages: write
   id-token: write
 
-# One deployment at a time. Newer queued runs supersede older *pending* ones,
-# but an in-progress deploy is always allowed to finish — so frequent data
-# commits queue cleanly instead of jamming the build.
+# One deployment at a time; let an in-progress deploy finish.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
   deploy:
-    # For workflow_run triggers, only deploy if the data refresh actually succeeded.
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: ${{ steps.deployment.outputs.page_url || steps.deployment-retry.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,6 +41,20 @@ jobs:
         with:
           path: '.'
 
+      # The Pages backend can transiently reject a deploy ("try again later"),
+      # even for a lone run. Try once, and if it fails, wait and retry once more.
+      # deploy-pages only publishes the already-uploaded artifact (it does not
+      # re-upload), so calling it twice in the same job is safe.
       - name: Deploy to GitHub Pages
         id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Wait before retry
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 45
+
+      - name: Deploy to GitHub Pages (retry)
+        id: deployment-retry
+        if: steps.deployment.outcome == 'failure'
         uses: actions/deploy-pages@v4

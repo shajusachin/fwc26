@@ -1339,7 +1339,13 @@ function applyDeepLink(){
 function render(){ renderLegend(); renderNext(); renderSchedule(); renderStandings(); renderScorers(); renderCities(); renderBracket(); }
 
 /* ── LIVE DATA LOADER ──────────────────────────────────── */
-const FEED='data-compact.json';
+// Live match feed is pulled straight from GitHub (raw) so data refreshes are
+// visible WITHOUT redeploying Pages. CORS-enabled, ~5 min CDN cache; the
+// per-request ?t= cache-buster keeps it real-time. Local file:// falls back
+// to the relative copy below.
+const FEED=(location.protocol==='http:'||location.protocol==='https:')&&location.hostname!=='localhost'&&location.hostname!=='127.0.0.1'
+  ? 'https://raw.githubusercontent.com/shajusachin/fwc26/main/data-compact.json'
+  : 'data-compact.json';
 function setStatus(kind,text){
   const el=$('data-status'); if(!el) return;
   el.className='data-status '+kind;
