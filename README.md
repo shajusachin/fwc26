@@ -20,9 +20,10 @@ each stadium.
 | 🔎 **Filters** | Filter by **team**, **group**, or **host city** |
 | 📊 **Standings** | Live group tables, including **Best Third-Place Teams** |
 | 👟 **Top scorers** | The Golden Boot race, updated with the data feed |
+| 👥 **Squads** | Every team's official 26-player squad on a football pitch, placed by role (GK/DEF/MID/FWD) — tap any player for club, caps &amp; age |
 | 🏆 **Knockout bracket** | Round of 32 → Final, neatly aligned on one screen |
 | 🏟 **Host Cities** | All 16 stadiums — hover/tap any card for stadium facts, tournament role, and **today's live weather** |
-| 📱 **Match details** | Tap any finished match for a full timeline — goals, cards, and substitutions |
+| 📱 **Match details** | Tap any finished match for a full timeline — real goals (scorer + minute) |
 | 🔗 **Share links** | Every filtered view has its own URL (e.g. `?team=Brazil`) you can copy and share |
 | 🖨 **Print mode** | A clean, printer-friendly layout |
 
@@ -95,9 +96,11 @@ automated refresh on your own fork, add the token as a repository secret named
 ```
 index.html              The entire app — one self-contained page
 data-compact.json       Runtime feed the page fetches (fixtures + scorers + details)
+squads.json             Official 26-player squads for all 48 teams (role-tagged)
 *-embed.js              Baked-in fallback snapshot (loads instantly / offline)
 data.json, scorers.json, match-details.json, fixtures.json   Raw, human-readable data
 scripts/refresh.mjs     Builds the feed (live from the API, or offline from raw files)
+scripts/build-squads.mjs  One-off builder for squads.json (parses Wikipedia squads)
 scripts/serve.mjs       Minimal local static server
 .github/workflows/      Scheduled data-refresh Action
 ```
@@ -107,6 +110,7 @@ scripts/serve.mjs       Minimal local static server
 ## 🙏 Credits & attribution
 
 - **Match & scorer data:** [football-data.org](https://www.football-data.org/)
+- **Squad rosters:** [Wikipedia — 2026 FIFA World Cup squads](https://en.wikipedia.org/wiki/2026_FIFA_World_Cup_squads) (CC BY-SA)
 - **Team flags:** [flagcdn.com](https://flagcdn.com/)
 - **Live stadium weather:** [Open-Meteo](https://open-meteo.com/)
 - **Original inspiration:** the excellent
