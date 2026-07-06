@@ -878,8 +878,14 @@ function renderStandings(){
     return `<div class="grp-card">
       <div class="grp-title gc-${L}">Group ${L}</div>
       <table><thead><tr><th>#</th><th style="text-align:left">Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr></thead>
-      <tbody>${rows}</tbody></table></div>`;
+      <tbody>${rows}</tbody></table>
+      <div class="city-foot"><button class="city-link" data-group="${L}">View matches →</button></div></div>`;
   }).join('');
+  $('groups').querySelectorAll('.city-link[data-group]').forEach(b=>{
+    b.onclick=()=>{ state.group=b.dataset.group; state.city='all'; state.team='all';
+      $('group-filter').value=state.group; $('city-filter').value='all'; $('team-filter').value='all';
+      renderSchedule(); setView('schedule'); $('jump-btn').style.display='none'; window.scrollTo({top:0,behavior:'smooth'}); };
+  });
 }
 
 /* ── BEST THIRD-PLACE ──────────────────────────────────── */
