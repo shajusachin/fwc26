@@ -292,12 +292,17 @@
     pointer-events:none;transition:opacity .25s,transform .25s;box-shadow:0 8px 24px rgba(0,0,0,.4);}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  /* Bracket — fits page width, no horizontal scroll */
-  .bracket{display:flex;align-items:stretch;gap:8px;}
-  .round{display:flex;flex-direction:column;flex:1;min-width:0;}
-  .round-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(10px,1.3vw,13px);letter-spacing:.5px;
+  /* Symmetric knockout bracket — two sides converging to the centre */
+  .bracket{display:flex;align-items:stretch;justify-content:center;gap:6px;overflow-x:auto;padding-bottom:10px;}
+  .kside{display:flex;align-items:stretch;gap:8px;flex:1 1 0;min-width:0;}
+  .kround{display:flex;flex-direction:column;flex:1;min-width:102px;}
+  .round-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(10px,1.2vw,13px);letter-spacing:.5px;
     text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:8px;flex:none;}
-  .round-ties{display:flex;flex-direction:column;justify-content:space-around;flex:1;gap:6px;min-height:0;}
+  .kties{display:flex;flex-direction:column;justify-content:space-around;flex:1;min-height:0;gap:6px;}
+  .kcenter{display:flex;flex-direction:column;justify-content:center;align-items:center;flex:none;min-width:158px;padding:0 6px;}
+  .kcenter .round-title{margin-bottom:6px;}
+  .kcenter .third-title{color:var(--text-muted);margin-top:16px;}
+  .kcenter .tie{width:100%;}
   .tie{background:var(--bg-match);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
   .tie .slot{display:flex;justify-content:space-between;align-items:center;padding:5px 7px;font-size:clamp(10px,1.25vw,13px);
     font-weight:600;font-family:'Barlow Condensed',sans-serif;gap:4px;}
@@ -308,14 +313,20 @@
   .tie .slot .sc{color:var(--gold);font-weight:800;flex-shrink:0;}
   .tie .slot.tbd{color:var(--text-muted);font-style:italic;}
   .tie.final{border-color:var(--gold);box-shadow:0 0 18px rgba(201,168,76,.25);}
+  .tie.third{border-color:var(--text-muted);opacity:.95;}
   .tie .tie-date{font-size:clamp(8px,1vw,10px);color:var(--text-muted);text-align:center;padding:3px;border-top:1px dashed var(--border);
     font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px;}
-  /* Mobile: stack rounds vertically (no horizontal scroll) */
+  /* Connector stubs: left ties exit right, right ties exit left */
+  .kside.left .kround:not(:last-child) .tie{position:relative;}
+  .kside.left .kround:not(:last-child) .tie::after{content:"";position:absolute;top:50%;right:-8px;width:8px;height:1px;background:var(--border);}
+  .kside.right .kround:not(:first-child) .tie{position:relative;}
+  .kside.right .kround:not(:first-child) .tie::before{content:"";position:absolute;top:50%;left:-8px;width:8px;height:1px;background:var(--border);}
+  /* Mobile: bracket scrolls horizontally; keep it usable */
   @media (max-width:780px){
-    .bracket{flex-direction:column;gap:18px;}
-    .round-ties{gap:8px;}
-    .round-title{font-size:14px;border-bottom:1px solid var(--border);padding-bottom:4px;}
-    .round .tie{max-width:480px;}
+    .bracket{justify-content:flex-start;}
+    .kround{min-width:120px;}
+    .kcenter{min-width:150px;}
+    .round-title{font-size:12px;}
   }
 
   .section-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;letter-spacing:1.5px;
@@ -416,7 +427,7 @@
 
   <div id="view-bracket" style="display:none">
     <div class="section-title">Knockout Bracket</div>
-    <p class="hint">From the Round of 32 to the Final — the full path to glory. Slots fill in as ties are decided.</p>
+    <p class="hint">From the Round of 32 to the Final — the full path to glory. Both halves converge on the centre. Slots fill in as ties are decided. On narrow screens, scroll sideways to explore.</p>
     <div class="bracket" id="bracket"></div>
     <div class="section-title" style="margin-top:28px">Best Third-Place Teams</div>
     <p class="hint">The 8 best third-placed teams across the 12 groups join the 24 group winners and runners-up in the Round of 32. <span style="color:var(--gold)">Gold line</span> marks the qualification cut-off.</p>
@@ -975,21 +986,47 @@ function tieSlot(name,score,isWin,pen){
   const sc = score!=null ? `<span class="sc">${score}${pen!=null?` <small>(${pen})</small>`:''}</span>` : '';
   return `<div class="slot ${isWin?'win':''}"><span class="nm">${flagImg(name,'sm')}${short(name)}</span>${sc}</div>`;
 }
+function tieHTML(m, extraClass){
+  if(!m) return `<div class="tie ${extraClass||''}"><div class="slot tbd"><span class="nm">TBD</span></div><div class="slot tbd"><span class="nm">TBD</span></div></div>`;
+  const hWin=m.winner==='HOME_TEAM', aWin=m.winner==='AWAY_TEAM';
+  return `<div class="tie ${extraClass||''}">
+    ${tieSlot(m.home,m.status==='FINISHED'?m.hs:null,hWin,m.pen?m.pen.h:null)}
+    ${tieSlot(m.away,m.status==='FINISHED'?m.as:null,aWin,m.pen?m.pen.a:null)}
+    <div class="tie-date">${m.status==='FINISHED'?'Full time':dShort(m.date)+' · '+fmtTime(m.date)}</div>
+  </div>`;
+}
 function renderBracket(){
-  const order=['LAST_32','LAST_16','QUARTER_FINALS','SEMI_FINALS','FINAL'];
-  const titles={LAST_32:'Round of 32',LAST_16:'Round of 16',QUARTER_FINALS:'Quarter-finals',SEMI_FINALS:'Semi-finals',FINAL:'Final'};
-  $('bracket').innerHTML = order.map(stg=>{
-    const ms=ALL.filter(m=>m.stage===stg);
-    const ties=ms.map(m=>{
-      const hWin=m.winner==='HOME_TEAM', aWin=m.winner==='AWAY_TEAM';
-      return `<div class="tie ${stg==='FINAL'?'final':''}">
-        ${tieSlot(m.home,m.status==='FINISHED'?m.hs:null,hWin,m.pen?m.pen.h:null)}
-        ${tieSlot(m.away,m.status==='FINISHED'?m.as:null,aWin,m.pen?m.pen.a:null)}
-        <div class="tie-date">${m.status==='FINISHED'?'Full time':dShort(m.date)+' · '+fmtTime(m.date)}</div>
-      </div>`;
-    }).join('');
-    return `<div class="round"><div class="round-title">${titles[stg]}</div><div class="round-ties">${ties}</div></div>`;
-  }).join('');
+  const byStage = s => ALL.filter(m=>m.stage===s).sort((a,b)=>a.id-b.id);
+  const R32=byStage('LAST_32'), R16=byStage('LAST_16'), QF=byStage('QUARTER_FINALS'),
+        SF=byStage('SEMI_FINALS'), F=byStage('FINAL'), TP=byStage('THIRD_PLACE');
+  // FIFA 2026 bracket tree (verified against real results). Stage lists are
+  // sorted by match id; these index maps split each round into the correct
+  // left/right halves so the tree actually converges to the centre.
+  const L={ r32:[0,1,2,3,8,9,10,11], r16:[0,1,2,3], qf:[0,1], sf:[0] };
+  const R={ r32:[4,5,6,7,12,13,14,15], r16:[4,5,6,7], qf:[2,3], sf:[1] };
+  const pick=(arr,idx)=>idx.map(i=>arr[i]);
+  const col=(title, matches, cls)=>
+    `<div class="kround ${cls}"><div class="round-title">${title}</div>
+      <div class="kties">${matches.map(m=>tieHTML(m)).join('')}</div></div>`;
+  $('bracket').innerHTML = `
+    <div class="kside left">
+      ${col('Round of 32', pick(R32,L.r32),'r32')}
+      ${col('Round of 16', pick(R16,L.r16),'r16')}
+      ${col('Quarter-finals', pick(QF,L.qf),'qf')}
+      ${col('Semi-final', pick(SF,L.sf),'sf')}
+    </div>
+    <div class="kcenter">
+      <div class="round-title">🏆 Final</div>
+      ${tieHTML(F[0],'final')}
+      <div class="round-title third-title">Third place</div>
+      ${tieHTML(TP[0],'third')}
+    </div>
+    <div class="kside right">
+      ${col('Semi-final', pick(SF,R.sf),'sf')}
+      ${col('Quarter-finals', pick(QF,R.qf),'qf')}
+      ${col('Round of 16', pick(R16,R.r16),'r16')}
+      ${col('Round of 32', pick(R32,R.r32),'r32')}
+    </div>`;
 }
 
 /* ── JUMP ──────────────────────────────────────────────── */
