@@ -6,6 +6,12 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main ]
+  # The data-refresh workflow pushes commits with the built-in GITHUB_TOKEN,
+  # and token pushes do NOT trigger `push` workflows (anti-recursion rule).
+  # So we also deploy whenever that workflow finishes, to keep live scores fresh.
+  workflow_run:
+    workflows: [ "Refresh World Cup data" ]
+    types: [ completed ]
   workflow_dispatch:
 
 permissions:
@@ -22,6 +28,8 @@ concurrency:
 
 jobs:
   deploy:
+    # For workflow_run triggers, only deploy if the data refresh actually succeeded.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
