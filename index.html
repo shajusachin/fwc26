@@ -292,22 +292,21 @@
     pointer-events:none;transition:opacity .25s,transform .25s;box-shadow:0 8px 24px rgba(0,0,0,.4);}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-  /* Symmetric knockout bracket — two sides converging to the centre */
-  .bracket{overflow-x:auto;padding-bottom:10px;}
-  /* max-content track centred with margin:auto — never clips like justify-content:center does under overflow */
-  .kwrap{display:flex;align-items:stretch;gap:6px;width:max-content;margin:0 auto;}
-  .kside{display:flex;align-items:stretch;gap:8px;flex:0 0 auto;}
-  .kround{display:flex;flex-direction:column;flex:0 0 108px;width:108px;}
-  .round-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(10px,1.2vw,13px);letter-spacing:.5px;
-    text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:8px;flex:none;}
+  /* Symmetric knockout bracket — two sides converging to the centre, fluid-fit (no horizontal scroll) */
+  .bracket{padding-bottom:4px;overflow:hidden;}
+  .kwrap{display:flex;align-items:stretch;gap:6px;width:100%;}
+  .kside{display:flex;align-items:stretch;gap:5px;flex:4 1 0;min-width:0;}
+  .kround{display:flex;flex-direction:column;flex:1 1 0;min-width:0;}
+  .round-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:clamp(9px,1.05vw,13px);letter-spacing:.3px;
+    text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:8px;flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .kties{display:flex;flex-direction:column;justify-content:space-around;flex:1;min-height:0;gap:6px;}
-  .kcenter{display:flex;flex-direction:column;justify-content:center;align-items:center;flex:0 0 auto;width:160px;padding:0 6px;}
+  .kcenter{display:flex;flex-direction:column;justify-content:center;align-items:center;flex:1 1 0;min-width:0;padding:0 4px;}
   .kcenter .round-title{margin-bottom:6px;}
   .kcenter .third-title{color:var(--text-muted);margin-top:16px;}
   .kcenter .tie{width:100%;}
   .tie{background:var(--bg-match);border:1px solid var(--border);border-radius:6px;overflow:hidden;}
-  .tie .slot{display:flex;justify-content:space-between;align-items:center;padding:5px 7px;font-size:clamp(10px,1.25vw,13px);
-    font-weight:600;font-family:'Barlow Condensed',sans-serif;gap:4px;}
+  .tie .slot{display:flex;justify-content:space-between;align-items:center;padding:5px 5px;font-size:clamp(9px,1.05vw,13px);
+    font-weight:600;font-family:'Barlow Condensed',sans-serif;gap:3px;}
   .tie .slot+.slot{border-top:1px solid var(--border);}
   .tie .slot .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;min-width:0;}
   .tie .slot .nm .fl{flex-shrink:0;}
@@ -320,14 +319,15 @@
     font-family:'Barlow Condensed',sans-serif;letter-spacing:.3px;}
   /* Connector stubs: left ties exit right, right ties exit left */
   .kside.left .kround:not(:last-child) .tie{position:relative;}
-  .kside.left .kround:not(:last-child) .tie::after{content:"";position:absolute;top:50%;right:-8px;width:8px;height:1px;background:var(--border);}
+  .kside.left .kround:not(:last-child) .tie::after{content:"";position:absolute;top:50%;right:-5px;width:5px;height:1px;background:var(--border);}
   .kside.right .kround:not(:first-child) .tie{position:relative;}
-  .kside.right .kround:not(:first-child) .tie::before{content:"";position:absolute;top:50%;left:-8px;width:8px;height:1px;background:var(--border);}
-  /* Mobile: bracket scrolls horizontally; keep it usable */
-  @media (max-width:780px){
-    .kround{flex-basis:120px;width:120px;}
-    .kcenter{width:150px;}
-    .round-title{font-size:12px;}
+  .kside.right .kround:not(:first-child) .tie::before{content:"";position:absolute;top:50%;left:-5px;width:5px;height:1px;background:var(--border);}
+  /* Narrow screens: shrink type so the whole bracket still fits with no scroll */
+  @media (max-width:680px){
+    .round-title{font-size:8px;letter-spacing:0;}
+    .tie .slot{padding:4px 3px;font-size:8.5px;gap:2px;}
+    .kside{gap:3px;}
+    .kwrap{gap:3px;}
   }
 
   .section-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;letter-spacing:1.5px;
