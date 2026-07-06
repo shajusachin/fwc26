@@ -36,7 +36,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data.json scorers.json match-details.json \
+          git add data.json scorers.json openfootball-2026.json \
                   fixtures-embed.js scorers-embed.js details-embed.js data-compact.json
           if git diff --quiet --cached; then
             echo "No changes to commit."
